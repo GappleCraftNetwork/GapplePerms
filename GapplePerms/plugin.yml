@@ -1,0 +1,20 @@
+name: GapplePerms
+main: com.github.arsenalfcgunners.gappleperms.GapplePerms
+version: 0.1
+commands:
+   promote:
+      description: Promotes a player to a higher rank.
+      usage: /<command>
+   demote:
+      description: demotes a player to a higher rank.
+      usage: /<command>
+   permission:
+      description: Manages the permissions of a rank.
+      usage: /<command>
+   ranklist:
+      description: Manages the permissions of a rank.
+      usage: /<command>
+
+Permissions:
+  gappleperms.changerank:
+    description: Allows the player to manages ranks.
