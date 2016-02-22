@@ -38,27 +38,28 @@ public class Demote implements CommandExecutor{
 						
 						if(player.hasPermission("gappleperms.changerank")){
 									
-								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
-									
-									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < rm.getRank(rankname).getLevel()){
-									
-										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
-											assignRank(playername, rankname);
-										}
-										
-										else{
-											player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You cannot demote a rank that is higher or equal to your own rank.");
-										}
+							if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
+								
+								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < rm.getRank(rankname).getLevel()){
+								
+									if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
+										assignRank(playername, rankname);
+										sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
 									}
 									
 									else{
-										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be lower than the old one. Use /promote to promote a rank.");
+										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You cannot demote a rank that is higher or equal to your own rank.");
 									}
 								}
 								
 								else{
-									player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You can only change the rank of a player with a lower rank than yourself.");
+									player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be lower than the old one. Use /promote to promote a rank.");
 								}
+							}
+							
+							else{
+								player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You can only change the rank of a player with a lower rank than yourself.");
+							}
 						}
 						
 						else{
@@ -67,7 +68,14 @@ public class Demote implements CommandExecutor{
 					}
 					
 					else{
-						assignRank(playername, rankname);
+						if(Bukkit.getOfflinePlayer(playername).getUniqueId() != null){
+							assignRank(playername, rankname);
+							sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
+						}
+						
+						else{
+							sender.sendMessage(tag+ChatColor.YELLOW+"ERROR: Player not found!");
+						}
 					}
 				}
 				

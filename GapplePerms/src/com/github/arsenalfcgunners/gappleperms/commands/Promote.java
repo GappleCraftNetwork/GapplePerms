@@ -46,6 +46,7 @@ public class Promote implements CommandExecutor{
 									
 										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 											assignRank(playername, rankname);
+											sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
 										}
 										
 										else{
@@ -74,7 +75,14 @@ public class Promote implements CommandExecutor{
 					}
 					
 					else{
-						assignRank(playername, rankname);
+						if(Bukkit.getOfflinePlayer(playername).getUniqueId() != null){
+							assignRank(playername, rankname);
+							sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
+						}
+						
+						else{
+							sender.sendMessage(tag+ChatColor.YELLOW+"ERROR: Player not found!");
+						}
 					}
 				}
 				

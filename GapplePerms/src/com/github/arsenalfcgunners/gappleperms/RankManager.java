@@ -79,7 +79,9 @@ public class RankManager {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 		
 		try {
-			str = rs.getString(1);
+			if(rs.next()){
+				str = rs.getString("Permissions");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -135,11 +137,11 @@ public class RankManager {
 	}
 	
 	public Rank getRankOfPlayer(UUID uuid){
-		ResultSet rs = gp.getDatabaseManager().query("SELECT DonorRanks FROM PlayerRanks WHERE Rank ='"+uuid.toString()+"';");
+		ResultSet rs = gp.getDatabaseManager().query("SELECT Rank FROM PlayerRanks WHERE UUID ='"+uuid.toString()+"';");
 		
 		try {
 			if(rs.next()){
-				return gp.getRankManager().getRank(rs.getString(1));
+				return gp.getRankManager().getRank(rs.getString("Rank"));
 			}
 			else{
 				gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString() + "','Default','none')");
@@ -175,7 +177,9 @@ public class RankManager {
 		ArrayList<Rank> dranks = new ArrayList<Rank>();
 		
 		try {
-			str = rs.getString(2);
+			if(rs.next()){
+				str = rs.getString("DonorRanks");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -195,6 +199,10 @@ public class RankManager {
 		
 		for(Rank rank : donorranks){
 			str += rank.getName()+",";
+		}
+		
+		if(str.equals("")){
+			str = "none";
 		}
 		
 		gp.getDatabaseManager().executeUpdate("UPDATE PlayerRanks SET DonorRanks='"+str+"' WHERE UUID='"+uuid.toString()+"'");
