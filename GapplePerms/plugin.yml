@@ -11,7 +11,7 @@ commands:
    permission:
       description: Manages the permissions of a rank.
       usage: /<command>
-   ranklist:
+   rank:
       description: Manages the permissions of a rank.
       usage: /<command>
 
