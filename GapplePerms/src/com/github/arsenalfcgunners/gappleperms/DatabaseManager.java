@@ -2,9 +2,10 @@ package com.github.arsenalfcgunners.gappleperms;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
@@ -14,13 +15,14 @@ public class DatabaseManager {
 	private String user;
 	private String password;
 	private Connection c;
-	private Statement s;
+	private GapplePerms gp;
 		
-	public DatabaseManager(String h, String d, String u, String p){
+	public DatabaseManager(GapplePerms plugin, String h, String d, String u, String p){
 		host = h;
 		database = d;
 		user = u;
 		password = p;
+		gp = plugin;
 		
 		try {
 			c = DriverManager.getConnection(host + database + "?autoReconnect=true", user, password);
@@ -34,11 +36,12 @@ public class DatabaseManager {
 	
 	public void executeUpdate(String statement){
 		try {
-			s = c.createStatement();
-			s.executeUpdate(statement);
+			PreparedStatement s = c.prepareStatement(statement);
+			s.execute();
 			s.close();
 		}
 		catch(SQLException ex) {
+        	gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: "+statement);
 			ex.printStackTrace();
 			stopServer();
 		}
@@ -47,9 +50,10 @@ public class DatabaseManager {
 	public ResultSet query(String query) {
         ResultSet rs = null;
         try {
-            s = c.createStatement();
-            rs = s.executeQuery(query);
+            PreparedStatement s = c.prepareStatement(query);
+            rs = s.executeQuery();
         } catch (SQLException e) {
+        	gp.getLogger().log(Level.SEVERE, "QUERY FAILED: "+query);
 			e.printStackTrace();
 			stopServer();
         }

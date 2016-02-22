@@ -9,12 +9,12 @@ import com.github.arsenalfcgunners.gappleperms.GapplePerms;
 import com.github.arsenalfcgunners.gappleperms.Rank;
 import com.github.arsenalfcgunners.gappleperms.RankManager;
 
-public class RankList implements CommandExecutor {
+public class RankCMD implements CommandExecutor {
 	private GapplePerms gp;
 	private String tag;
 	private RankManager rm;
 
-	public RankList(GapplePerms plugin) {
+	public RankCMD(GapplePerms plugin) {
 		gp = plugin;
 		tag = gp.getTag();
 		rm = gp.getRankManager();
@@ -36,7 +36,11 @@ public class RankList implements CommandExecutor {
 					
 					sender.sendMessage(msg);
 				}
-						
+				
+				else if((args.length == 2 && args[0].equalsIgnoreCase("get"))){
+					sender.sendMessage(tag+"Coming soon!");
+				}
+				
 				else{
 					sender.sendMessage(tag+ChatColor.RED+"/rank list");
 				}

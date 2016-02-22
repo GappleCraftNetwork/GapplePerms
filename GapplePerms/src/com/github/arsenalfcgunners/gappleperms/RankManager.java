@@ -5,12 +5,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-@SuppressWarnings("deprecation")
 public class RankManager {
 	private ArrayList<Rank> ranks;
 	private GapplePerms gp;
@@ -77,7 +74,7 @@ public class RankManager {
 	}
 	
 	public ArrayList<Permission> getPermissions(Rank rank){
-		ResultSet rs = gp.getDatabaseManager().query("SELECT "+rank.getName()+" FROM Permissions");
+		ResultSet rs = gp.getDatabaseManager().query("SELECT Permissions FROM Permissions WHERE Rank ='"+rank.getName()+"';");
 		String str = "";
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 		
@@ -101,7 +98,18 @@ public class RankManager {
 			str += p.getName()+",";
 		}
 		
-		gp.getDatabaseManager().executeUpdate("INSERT INTO Permissions(+"+rank.getName()+") VALUES (" + str + ")");
+		ResultSet rs = gp.getDatabaseManager().query("SELECT Permissions FROM Permissions WHERE Rank ='"+rank.getName()+"';");
+		
+		try {
+			if(rs.next()){
+				gp.getDatabaseManager().executeUpdate("UPDATE Permissions SET Permissions='"+str+"' WHERE Rank='"+rank.getName()+"'");
+			}
+			else{
+				gp.getDatabaseManager().executeUpdate("INSERT INTO Permissions (Rank, Permissions) VALUES ('" + rank.getName() + "','"+str+"')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean isRankName(String name){
@@ -122,66 +130,74 @@ public class RankManager {
 		return ranks.get(0);
 	}
 	
-	public void setRank(String playername, Rank rank){
-		Player player = Bukkit.getPlayer(playername);
-		gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks(+"+player.getUniqueId()+") VALUES (" + rank.getName() + ")");
+	public void setRank(UUID uuid, Rank rank){
+		gp.getDatabaseManager().executeUpdate("UPDATE PlayerRanks SET Rank='"+rank.getName()+"' WHERE UUID='"+uuid.toString()+"'");
 	}
 	
-	public Rank getRankOfPlayer(Player player){
-		ResultSet rs = gp.getDatabaseManager().query("SELECT "+player.getUniqueId()+" FROM PlayerRanks");
+	public Rank getRankOfPlayer(UUID uuid){
+		ResultSet rs = gp.getDatabaseManager().query("SELECT DonorRanks FROM PlayerRanks WHERE Rank ='"+uuid.toString()+"';");
 		
 		try {
-			return gp.getRankManager().getRank(rs.getString(1));
+			if(rs.next()){
+				return gp.getRankManager().getRank(rs.getString(1));
+			}
+			else{
+				gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString() + "','Default','none')");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return ranks.get(ranks.size()-1);
 	}
 	
-	public void promoteOfflinePlayer(String playername, Rank rank){
-		ArrayList<Rank> donorranks = getDonorRanks(Bukkit.getOfflinePlayer(playername).getUniqueId());
+	public void promoteOfflinePlayer(UUID uuid, Rank rank){
+		ArrayList<Rank> donorranks = getDonorRanks(uuid);
 		if(rank.getLevel() >= gp.getDonorLevel() && rank.getLevel() < gp.getStaffLevel() && !donorranks.contains(rank)){
 			donorranks.add(rank);
 		}
-		setRank(playername, rank);
+		setRank(uuid, rank);
 	}
 	
-	public void demoteOfflinePlayer(String playername, Rank rank){
-		ArrayList<Rank> donorranks = getDonorRanks(Bukkit.getOfflinePlayer(playername).getUniqueId());
+	public void demoteOfflinePlayer(UUID uuid, Rank rank){
+		ArrayList<Rank> donorranks = getDonorRanks(uuid);
 		for(int i = 0; i < donorranks.size(); i++){
 			if(donorranks.get(i).getLevel() >= rank.getLevel()){
 				donorranks.remove(i);
 			}
 		}
-		setRank(playername, rank);
+		setRank(uuid, rank);
 	}
 	
 	public ArrayList<Rank> getDonorRanks(UUID uuid){
-		ResultSet rs = gp.getDatabaseManager().query("SELECT "+uuid.toString()+" FROM DonorRanks");
+		ResultSet rs = gp.getDatabaseManager().query("SELECT DonorRanks FROM PlayerRanks WHERE UUID= '"+uuid.toString()+"';");
 		String str = "";
 		ArrayList<Rank> dranks = new ArrayList<Rank>();
 		
 		try {
-			str = rs.getString(1);
+			str = rs.getString(2);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		while(str.indexOf(",") > -1){
-			dranks.add(getRank(str.substring(str.lastIndexOf(","))));
+			if(!str.substring(str.lastIndexOf(",")).equals("none")){
+				dranks.add(getRank(str.substring(str.lastIndexOf(","))));
+				str = str.substring(0, str.lastIndexOf(","));
+			}
 		}
 		
 		return dranks;
 	}
 
-	public void setDonorRanks(Player player, ArrayList<Rank> donorranks) {
+	public void setDonorRanks(UUID uuid, ArrayList<Rank> donorranks) {
 		String str = "";
 		
 		for(Rank rank : donorranks){
 			str += rank.getName()+",";
 		}
 		
-		gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks(+"+player.getUniqueId()+") VALUES (" + str + ")");
+		gp.getDatabaseManager().executeUpdate("UPDATE PlayerRanks SET DonorRanks='"+str+"' WHERE UUID='"+uuid.toString()+"'");
+		
 	}	
 }

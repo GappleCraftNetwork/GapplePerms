@@ -11,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.arsenalfcgunners.gappleperms.commands.Demote;
 import com.github.arsenalfcgunners.gappleperms.commands.Permissions;
 import com.github.arsenalfcgunners.gappleperms.commands.Promote;
-import com.github.arsenalfcgunners.gappleperms.commands.RankList;
+import com.github.arsenalfcgunners.gappleperms.commands.RankCMD;
 
 public class GapplePerms extends JavaPlugin{
 	private RankManager rm;
@@ -23,22 +23,24 @@ public class GapplePerms extends JavaPlugin{
 	
 	@Override
 	public void onEnable(){
-		rm = new RankManager(this);
 		pp = new ArrayList<PlayerProfile>();
+		tag = ChatColor.GRAY+"["+ChatColor.GOLD+"GapplePerms"+ChatColor.GRAY+"] ";
 		
 		//Listeners
 		new PlayerListener(this);
 		
 		//Databases
-		dm = new DatabaseManager("jdbc:mysql://167.114.208.215:3306/", "ihdb_175", "ihdb_175", "22fdf2acbd");
+		dm = new DatabaseManager(this, "jdbc:mysql://167.114.208.215:3306/", "ihdb_175", "ihdb_175", "22fdf2acbd");
+		
+		//RankManager
+		rm = new RankManager(this);
 		
 		//Command Executers
 		getCommand("promote").setExecutor(new Promote(this));
 		getCommand("demote").setExecutor(new Demote(this));
 		getCommand("permission").setExecutor(new Permissions(this));
-		getCommand("ranklist").setExecutor(new RankList(this));
+		getCommand("rank").setExecutor(new RankCMD(this));
 		
-		tag = ChatColor.GRAY+"["+ChatColor.GOLD+"GapplePerms"+ChatColor.GRAY+"] ";
 		donor = 1;
 		staff = 6;
 		
@@ -79,7 +81,7 @@ public class GapplePerms extends JavaPlugin{
 			}
 			profile.demote(highest);
 		}
-		rm.setDonorRanks(p, donorranks);
+		rm.setDonorRanks(p.getUniqueId(), donorranks);
 	}
 	
 	public PlayerProfile getProfileOfPlayer(Player p){
@@ -92,7 +94,7 @@ public class GapplePerms extends JavaPlugin{
 	}
 	
 	public void addPlayerProfile(Player p){
-		PlayerProfile profile = new PlayerProfile(p, rm.getRankOfPlayer(p), this);
+		PlayerProfile profile = new PlayerProfile(p.getUniqueId(), rm.getRankOfPlayer(p.getUniqueId()), this);
 		profile.givePerms();
 		pp.add(profile);
 	}

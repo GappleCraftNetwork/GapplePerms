@@ -38,9 +38,9 @@ public class Demote implements CommandExecutor{
 						
 						if(player.hasPermission("gappleperms.changerank")){
 									
-								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername)).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
+								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 									
-									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername)).getLevel() < rm.getRank(rankname).getLevel()){
+									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < rm.getRank(rankname).getLevel()){
 									
 										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 											assignRank(playername, rankname);
@@ -91,7 +91,7 @@ public class Demote implements CommandExecutor{
 		}
 		
 		else{
-			rm.demoteOfflinePlayer(playername, rm.getRank(rankname));
+			rm.demoteOfflinePlayer(Bukkit.getOfflinePlayer(playername).getUniqueId(), rm.getRank(rankname));
 		}
 	}
 }

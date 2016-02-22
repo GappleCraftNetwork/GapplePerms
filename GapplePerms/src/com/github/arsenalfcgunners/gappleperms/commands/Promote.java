@@ -40,9 +40,9 @@ public class Promote implements CommandExecutor{
 							
 							if(rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
 								
-								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername)).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
+								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 									
-									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername)).getLevel() < rm.getRank(rankname).getLevel()){
+									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < rm.getRank(rankname).getLevel()){
 									
 										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 											assignRank(playername, rankname);
@@ -98,7 +98,7 @@ public class Promote implements CommandExecutor{
 		}
 		
 		else{
-			rm.promoteOfflinePlayer(playername, rm.getRank(rankname));
+			rm.promoteOfflinePlayer(Bukkit.getOfflinePlayer(playername).getUniqueId(), rm.getRank(rankname));
 		}
 	}
 }
