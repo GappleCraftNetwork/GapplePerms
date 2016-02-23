@@ -1,6 +1,7 @@
 package com.github.arsenalfcgunners.gappleperms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 
 import org.bukkit.Bukkit;
@@ -103,10 +104,12 @@ public class GapplePerms extends JavaPlugin{
 	}
 	
 	public void removePlayerProfile(Player p){
-		for(PlayerProfile profile: pp){
+		Iterator<PlayerProfile> ipp = pp.iterator();
+		while(ipp.hasNext()){
+			PlayerProfile profile = ipp.next();
 			if(profile.getPlayer().equals(p)){
 				profile.clearPerms();
-				pp.remove(profile);
+				ipp.remove();
 			}
 		}
 	}
