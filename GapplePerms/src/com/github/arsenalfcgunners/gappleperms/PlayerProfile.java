@@ -71,7 +71,7 @@ public class PlayerProfile {
 	
 	public void promote(Rank r){
 		rank = r;
-		if(rank.getLevel() >= gp.getDonorLevel() && rank.getLevel() < gp.getStaffLevel() && !donorranks.contains(rank)){
+		if(rank.isDonor() && !donorranks.contains(rank)){
 			donorranks.add(rank);
 		}
 		clearPerms();

@@ -19,17 +19,17 @@ public class RankManager {
 	}
 	
 	public void addRanks(){
-		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 10));
-		ranks.add(new Rank("Dev", ChatColor.GRAY, 9));
-		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 8));
-		ranks.add(new Rank("SrMod", ChatColor.RED, 7));
-		ranks.add(new Rank("Mod", ChatColor.LIGHT_PURPLE, 6));
-		ranks.add(new Rank("VIP", ChatColor.GOLD, 5));
-		ranks.add(new Rank("Builder", ChatColor.BLUE, 4));
-		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA, 3));
-		ranks.add(new Rank("Emerald", ChatColor.GREEN, 2));
-		ranks.add(new Rank("Amethyst", ChatColor.DARK_PURPLE, 1));
-		ranks.add(new Rank("Default", ChatColor.YELLOW, 0));
+		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 10, false));
+		ranks.add(new Rank("Dev", ChatColor.GRAY, 9, false));
+		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 8, false));
+		ranks.add(new Rank("SrMod", ChatColor.RED, 7, false));
+		ranks.add(new Rank("Mod", ChatColor.LIGHT_PURPLE, 6, false));
+		ranks.add(new Rank("VIP", ChatColor.GOLD, 5, true));
+		ranks.add(new Rank("Builder", ChatColor.BLUE, 4, true));
+		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA, 3, true));
+		ranks.add(new Rank("Emerald", ChatColor.GREEN, 2, true));
+		ranks.add(new Rank("Amethyst", ChatColor.DARK_PURPLE, 1, true));
+		ranks.add(new Rank("Default", ChatColor.YELLOW, 0, false));
 	}
 	
 	public ArrayList<Rank> getRankList(){
@@ -133,7 +133,19 @@ public class RankManager {
 	}
 	
 	public void setRank(UUID uuid, Rank rank){
-		gp.getDatabaseManager().executeUpdate("UPDATE PlayerRanks SET Rank='"+rank.getName()+"' WHERE UUID='"+uuid.toString()+"'");
+		ResultSet rs = gp.getDatabaseManager().query("SELECT Rank FROM PlayerRanks WHERE UUID ='"+uuid.toString()+"';");
+
+		try {
+			if(rs.next()){
+				gp.getDatabaseManager().executeUpdate("UPDATE PlayerRanks SET Rank='"+rank.getName()+"' WHERE UUID='"+uuid.toString()+"'");
+			}
+			else{
+				gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString() + "','Default','none')");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public Rank getRankOfPlayer(UUID uuid){
@@ -155,7 +167,7 @@ public class RankManager {
 	
 	public void promoteOfflinePlayer(UUID uuid, Rank rank){
 		ArrayList<Rank> donorranks = getDonorRanks(uuid);
-		if(rank.getLevel() >= gp.getDonorLevel() && rank.getLevel() < gp.getStaffLevel() && !donorranks.contains(rank)){
+		if(rank.isDonor() && !donorranks.contains(rank)){
 			donorranks.add(rank);
 		}
 		setRank(uuid, rank);

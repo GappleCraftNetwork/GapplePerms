@@ -17,7 +17,6 @@ public class GapplePerms extends JavaPlugin{
 	private RankManager rm;
 	private ArrayList<PlayerProfile> pp;
 	private String tag;
-	private int donor, staff;
 	private Timer timer;
 	private DatabaseManager dm;
 	
@@ -40,9 +39,6 @@ public class GapplePerms extends JavaPlugin{
 		getCommand("demote").setExecutor(new Demote(this));
 		getCommand("permission").setExecutor(new Permissions(this));
 		getCommand("rank").setExecutor(new RankCMD(this));
-		
-		donor = 1;
-		staff = 6;
 		
 		for(Player player : Bukkit.getOnlinePlayers()){
 			addPlayerProfile(player);
@@ -115,14 +111,6 @@ public class GapplePerms extends JavaPlugin{
 	
 	public ArrayList<PlayerProfile> getPlayerProfiles(){
 		return pp;
-	}
-	
-	public int getStaffLevel(){
-		return staff;
-	}
-	
-	public int getDonorLevel(){
-		return donor;
 	}
 	
 	public String getTag(){
