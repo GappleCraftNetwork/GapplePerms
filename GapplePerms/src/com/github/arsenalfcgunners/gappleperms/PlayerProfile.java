@@ -46,20 +46,6 @@ public class PlayerProfile {
 		return donorranks;
 	}
 	
-	public void addDonorRank(Rank rank){
-		if(!donorranks.contains(rank)){
-			donorranks.add(rank);
-		}
-		gp.getRankManager().setDonorRanks(uuid, donorranks);
-	}
-	
-	public void delDonorRank(Rank rank){
-		if(donorranks.contains(rank)){
-			donorranks.remove(rank);
-		}
-		gp.getRankManager().setDonorRanks(uuid, donorranks);
-	}
-	
 	public void clearPerms(){
 		Iterator<Entry<UUID, PermissionAttachment>> it = attachments.entrySet().iterator();
 		while(it.hasNext()) {
