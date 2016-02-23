@@ -12,6 +12,7 @@ import com.github.arsenalfcgunners.gappleperms.commands.Demote;
 import com.github.arsenalfcgunners.gappleperms.commands.Permissions;
 import com.github.arsenalfcgunners.gappleperms.commands.Promote;
 import com.github.arsenalfcgunners.gappleperms.commands.RankCMD;
+import com.github.arsenalfcgunners.gappleperms.commands.ResetDB;
 
 public class GapplePerms extends JavaPlugin{
 	private RankManager rm;
@@ -39,6 +40,7 @@ public class GapplePerms extends JavaPlugin{
 		getCommand("demote").setExecutor(new Demote(this));
 		getCommand("permission").setExecutor(new Permissions(this));
 		getCommand("rank").setExecutor(new RankCMD(this));
+		getCommand("resetdb").setExecutor(new ResetDB(this));
 		
 		for(Player player : Bukkit.getOnlinePlayers()){
 			addPlayerProfile(player);
