@@ -19,17 +19,17 @@ public class RankManager {
 	}
 	
 	public void addRanks(){
-		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 10, false));
-		ranks.add(new Rank("Dev", ChatColor.GRAY, 9, false));
-		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 8, false));
-		ranks.add(new Rank("SrMod", ChatColor.RED, 7, false));
-		ranks.add(new Rank("Mod", ChatColor.LIGHT_PURPLE, 6, false));
-		ranks.add(new Rank("VIP", ChatColor.GOLD, 5, true));
-		ranks.add(new Rank("Builder", ChatColor.BLUE, 4, true));
-		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA, 3, true));
-		ranks.add(new Rank("Emerald", ChatColor.GREEN, 2, true));
-		ranks.add(new Rank("Amethyst", ChatColor.DARK_PURPLE, 1, true));
-		ranks.add(new Rank("Default", ChatColor.YELLOW, 0, false));
+		ranks.add(new Rank("Owner", ChatColor.BOLD+""+ChatColor.DARK_RED, 10, false));
+		ranks.add(new Rank("Dev", ChatColor.BOLD+""+ChatColor.DARK_PURPLE, 9, false));
+		ranks.add(new Rank("Admin", ChatColor.BOLD+""+ChatColor.DARK_RED, 8, false));
+		ranks.add(new Rank("SrMod", ChatColor.DARK_RED+"", 7, false));
+		ranks.add(new Rank("Mod", ChatColor.RED+"", 6, false));
+		ranks.add(new Rank("VIP", ChatColor.GOLD+"", 5, true));
+		ranks.add(new Rank("Builder", ChatColor.BLUE+"", 4, true));
+		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA+"", 3, true));
+		ranks.add(new Rank("Emerald", ChatColor.GREEN+"", 2, true));
+		ranks.add(new Rank("Amethyst", ChatColor.LIGHT_PURPLE+"", 1, true));
+		ranks.add(new Rank("Default", ChatColor.YELLOW+"", 0, false));
 	}
 	
 	public ArrayList<Rank> getRankList(){
