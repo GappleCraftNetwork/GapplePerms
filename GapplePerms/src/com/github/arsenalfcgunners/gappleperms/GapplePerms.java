@@ -20,7 +20,6 @@ public class GapplePerms extends JavaPlugin{
 	private ArrayList<PlayerProfile> pp;
 	private String tag;
 	private Timer timer;
-	private DatabaseManager dm;
 	
 	@Override
 	public void onEnable(){
@@ -30,11 +29,8 @@ public class GapplePerms extends JavaPlugin{
 		//Listeners
 		new PlayerListener(this);
 		
-		//Databases
-		dm = new DatabaseManager(this, "jdbc:mysql://167.114.208.215:3306/", "ihdb_175", "ihdb_175", "22fdf2acbd");
-		
-		//RankManager
-		rm = new RankManager(this);
+		//Rank Manager
+		rm = new RankManager(this, "jdbc:mysql://167.114.208.215:3306/", "ihdb_175", "ihdb_175", "22fdf2acbd");
 		
 		//Command Executers
 		getCommand("promote").setExecutor(new Promote(this));
@@ -58,10 +54,6 @@ public class GapplePerms extends JavaPlugin{
 	
 	public RankManager getRankManager(){
 		return rm;
-	}
-	
-	public DatabaseManager getDatabaseManager(){
-		return dm;
 	}
 	
 	public void removeDonor(Rank r, Player p){

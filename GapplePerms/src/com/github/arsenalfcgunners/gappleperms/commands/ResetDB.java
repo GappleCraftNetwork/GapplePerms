@@ -5,17 +5,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.github.arsenalfcgunners.gappleperms.DatabaseManager;
 import com.github.arsenalfcgunners.gappleperms.GapplePerms;
+import com.github.arsenalfcgunners.gappleperms.RankManager;
 
 // Not this will be removed, for testing purposes only!
 public class ResetDB implements CommandExecutor{
 	private GapplePerms gp;
-	private DatabaseManager dm;
+	private RankManager rm;
 
 	public ResetDB(GapplePerms plugin) {
 		gp = plugin;
-		dm = gp.getDatabaseManager();
+		rm = gp.getRankManager();
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class ResetDB implements CommandExecutor{
 		if(cmd.getName().equalsIgnoreCase("resetdb")){
 			
 			if(!(sender instanceof Player)){
-				dm.executeUpdate("TRUNCATE TABLE PlayerRanks");
+				rm.executeUpdate("TRUNCATE TABLE PlayerRanks");
 			}
 			return true;
 		}
