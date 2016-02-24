@@ -3,10 +3,9 @@ package com.github.arsenalfcgunners.gappleperms;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-@SuppressWarnings("deprecation")
 public class PlayerListener implements Listener{
 	GapplePerms gp;
 	
@@ -16,9 +15,9 @@ public class PlayerListener implements Listener{
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onJoin(PlayerPreLoginEvent e){
-		PlayerProfile profile = new PlayerProfile(e.getUniqueId(), gp.getRankManager().getRankOfPlayer(e.getUniqueId()), gp);
-		gp.addPlayerProfile(profile);		
+	public void onJoin(PlayerLoginEvent e){
+		PlayerProfile profile = new PlayerProfile(e.getPlayer().getUniqueId(), gp.getRankManager().getRankOfPlayer(e.getPlayer().getUniqueId()), gp);
+		gp.addPlayerProfile(profile);	
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
