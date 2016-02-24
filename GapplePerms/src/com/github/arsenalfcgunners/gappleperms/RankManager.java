@@ -3,6 +3,8 @@ package com.github.arsenalfcgunners.gappleperms;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -129,7 +131,7 @@ public class RankManager {
 				return rank;
 			}
 		}
-		return ranks.get(0);
+		return ranks.get(ranks.size()-1);
 	}
 	
 	public void setRank(UUID uuid, Rank rank){
@@ -196,10 +198,11 @@ public class RankManager {
 			e.printStackTrace();
 		}
 		
-		while(str.indexOf(",") > -1){
-			if(!str.substring(str.lastIndexOf(",")).equals("none")){
-				dranks.add(getRank(str.substring(str.lastIndexOf(","))));
-				str = str.substring(0, str.lastIndexOf(","));
+		List<String> stringlist= Arrays.asList(str.split(","));
+		
+		for(String r : stringlist){
+			if(!r.equals("none")){
+				dranks.add(getRank(r));
 			}
 		}
 		

@@ -60,18 +60,18 @@ public class PlayerProfile {
 		if(rank.isDonor() && !donorranks.contains(rank)){
 			donorranks.add(rank);
 		}
-		clearPerms();
-		givePerms();
 		gp.getRankManager().setDonorRanks(uuid, donorranks);
 		gp.getRankManager().setRank(uuid, rank);
+		clearPerms();
+		givePerms();
 	}
 	
 	public void demote(Rank r){
 		rank = r;
-		clearPerms();
-		givePerms();
 		gp.getRankManager().setDonorRanks(uuid, donorranks);
 		gp.getRankManager().setRank(uuid, rank);
+		clearPerms();
+		givePerms();
 	}
 	
 	public void refresh(){
