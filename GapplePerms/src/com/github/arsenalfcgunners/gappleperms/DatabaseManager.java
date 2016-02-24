@@ -14,8 +14,8 @@ public class DatabaseManager {
 	private String database;
 	private String user;
 	private String password;
-	private Connection c;
 	private GapplePerms gp;
+	private Connection c;
 		
 	public DatabaseManager(GapplePerms plugin, String h, String d, String u, String p){
 		host = h;
@@ -23,7 +23,61 @@ public class DatabaseManager {
 		user = u;
 		password = p;
 		gp = plugin;
-		
+		c = null;
+	}
+	
+	public void executeUpdate(String statement){
+		PreparedStatement s = null;
+		try {
+			s = c.prepareStatement(statement);
+			s.execute();
+			s.close();
+		} catch(SQLException ex) {
+        	gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: "+statement);
+			ex.printStackTrace();
+			stopServer();
+		} finally {
+        	if(s != null){
+        		try { s.close(); } catch (SQLException e) { e.printStackTrace(); }
+        	}
+        	if(c != null){
+        		closeConnection();
+        	}
+		}
+	}
+	
+	public ResultSet query(String query) {
+        PreparedStatement s = null;
+        ResultSet rs = null;
+        try {
+        	openConnection();
+            s = c.prepareStatement(query);
+            rs = s.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+        	gp.getLogger().log(Level.SEVERE, "QUERY FAILED: "+query);
+			e.printStackTrace();
+			stopServer();
+        } finally {
+        	if(rs != null){
+        		try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+        	}
+        	if(s != null){
+        		try { s.close(); } catch (SQLException e) { e.printStackTrace(); }
+        	}
+        	if(c != null){
+        		closeConnection();
+        	}
+        }
+        return rs;
+    }
+	
+	public void stopServer(){
+		Bukkit.getLogger().info("Database Failure! Stopping server.");
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
+	}
+	
+	public void openConnection(){
 		try {
 			c = DriverManager.getConnection(host + database + "?autoReconnect=true", user, password);
 		}
@@ -34,34 +88,11 @@ public class DatabaseManager {
 		}
 	}
 	
-	public void executeUpdate(String statement){
+	public void closeConnection(){
 		try {
-			PreparedStatement s = c.prepareStatement(statement);
-			s.execute();
-			s.close();
-		}
-		catch(SQLException ex) {
-        	gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: "+statement);
-			ex.printStackTrace();
-			stopServer();
-		}
-	}
-	
-	public ResultSet query(String query) {
-        ResultSet rs = null;
-        try {
-            PreparedStatement s = c.prepareStatement(query);
-            rs = s.executeQuery();
-        } catch (SQLException e) {
-        	gp.getLogger().log(Level.SEVERE, "QUERY FAILED: "+query);
+			c.close();
+		} catch (SQLException e) {
 			e.printStackTrace();
-			stopServer();
-        }
-        return rs;
-    }
-	
-	public void stopServer(){
-		Bukkit.getLogger().info("Database Failure! Stopping server.");
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
+		}
 	}
 }

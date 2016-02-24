@@ -54,6 +54,7 @@ public class GapplePerms extends JavaPlugin{
 	@Override
 	public void onDisable(){
 		timer.cancel();
+		dm.closeConnection();
 	}
 	
 	public RankManager getRankManager(){

@@ -84,6 +84,7 @@ public class RankManager {
 			if(rs.next()){
 				str = rs.getString("Permissions");
 			}
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -111,6 +112,7 @@ public class RankManager {
 			else{
 				gp.getDatabaseManager().executeUpdate("INSERT INTO Permissions (Rank, Permissions) VALUES ('" + rank.getName() + "','"+str+"')");
 			}
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -160,6 +162,7 @@ public class RankManager {
 			else{
 				gp.getDatabaseManager().executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString() + "','Default','none')");
 			}
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -194,6 +197,7 @@ public class RankManager {
 			if(rs.next()){
 				str = rs.getString("DonorRanks");
 			}
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
