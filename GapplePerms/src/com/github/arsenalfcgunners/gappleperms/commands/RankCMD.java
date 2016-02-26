@@ -1,5 +1,7 @@
 package com.github.arsenalfcgunners.gappleperms.commands;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -34,14 +36,43 @@ public class RankCMD implements CommandExecutor {
 					String msg = tag+ChatColor.GREEN+"The follwing ranks are available:"+ChatColor.YELLOW;
 					
 					for(Rank r : rm.getRankList()){
-						msg += "\n"+r.getName();
+						msg += "\n"+r.getColor()+r.getName();
 					}
 					
 					sender.sendMessage(msg);
 				}
 				
 				else if((args.length == 2 && args[0].equalsIgnoreCase("get"))){
-					sender.sendMessage(tag+"Coming soon!");
+					if(Bukkit.getPlayer(args[1]) != null){
+						Player p = Bukkit.getPlayer(args[1]);
+						Rank r = rm.getRankOfPlayer(p.getUniqueId());
+						sender.sendMessage(tag+ChatColor.GREEN+"The rank of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" is "+r.getColor()+r.getName()+ChatColor.GREEN+".");
+					}
+					else{
+						sender.sendMessage(tag+ChatColor.YELLOW+"ERROR: Player not found!");
+					}
+				}
+				
+				else if((args.length == 3 && args[0].equalsIgnoreCase("get")) && args[1].equalsIgnoreCase("donorranks")){
+					if(Bukkit.getPlayer(args[1]) != null){
+						Player p = Bukkit.getPlayer(args[1]);
+						ArrayList<Rank> dranks = rm.getDonorRanks(p.getUniqueId());
+						if(dranks.size() == 0){
+							sender.sendMessage(tag+ChatColor.RED+"That player does not have any donor ranks.");
+						}
+						else{
+							String str = tag+ChatColor.GREEN+"The donor rank(s) of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" are:";
+							
+							for(Rank r : dranks){
+								str += "\n"+r.getColor()+r.getName();
+							}
+							
+							sender.sendMessage(str);
+						}
+					}
+					else{
+						sender.sendMessage(tag+ChatColor.YELLOW+"ERROR: Player not found!");
+					}
 				}
 				
 				else if(args.length == 3 && args[0].equalsIgnoreCase("set")){
@@ -52,42 +83,35 @@ public class RankCMD implements CommandExecutor {
 						
 						if(sender instanceof Player){
 							Player player = (Player) sender;
-							
-							if(player.hasPermission("gappleperms.changerank")){
+															
+							if(rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
 								
-								if(rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
+								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 									
-									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
-										
-										if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() == rm.getRank(rankname).getLevel()){
-										
-											if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
-												assignRank(playername, rankname);
-												sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
-											}
-											
-											else{
-												player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You cannot set a rank that is higher or equal to your own rank.");
-											}
+									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() == rm.getRank(rankname).getLevel()){
+									
+										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
+											assignRank(playername, rankname);
+											sender.sendMessage(tag+ChatColor.GREEN+"Rank updated successfully.");
 										}
 										
 										else{
-											player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be different than the old one.");
+											player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You cannot set a rank that is higher or equal to your own rank.");
 										}
 									}
 									
 									else{
-										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You can only change the rank of a player with a lower rank than yourself.");
+										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be different than the old one.");
 									}
 								}
 								
 								else{
-									player.sendMessage(tag+ChatColor.YELLOW+"ERROR: That rank must be set from the console for security reasons.");
+									player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You can only change the rank of a player with a lower rank than yourself.");
 								}
 							}
 							
 							else{
-								player.sendMessage(tag+ChatColor.YELLOW+"ERROR: You don't have permission.");
+								player.sendMessage(tag+ChatColor.YELLOW+"ERROR: That rank must be set from the console for security reasons.");
 							}
 						}
 							
@@ -115,9 +139,13 @@ public class RankCMD implements CommandExecutor {
 				}
 				
 				else{
-					sender.sendMessage(tag+ChatColor.RED+"/rank list or /rank <set> <player> <rank>");
+					sender.sendMessage(tag+ChatColor.RED+"/rank list, /rank <set> <player> <rank>, /rank get <player>, /rank get donorranks <player>");
 				}
 				
+			}
+			
+			else{
+				sender.sendMessage(tag+ChatColor.YELLOW+"ERROR: You don't have permission.");
 			}
 			return true;
 		}		
