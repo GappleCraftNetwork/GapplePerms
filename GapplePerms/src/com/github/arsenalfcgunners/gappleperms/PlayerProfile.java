@@ -68,6 +68,17 @@ public class PlayerProfile {
 	
 	public void demote(Rank r){
 		rank = r;
+		
+		for (int i = donorranks.size()-1; i >= 0; i--) {
+			if (donorranks.get(i).getLevel() > rank.getLevel()) {
+				donorranks.remove(i);
+			}
+		}
+		
+		if(rank.isDonor() && !donorranks.contains(rank)){
+			donorranks.add(rank);
+		}
+		
 		gp.getRankManager().setDonorRanks(uuid, donorranks);
 		gp.getRankManager().setRank(uuid, rank);
 		clearPerms();

@@ -119,11 +119,16 @@ public class RankManager {
 
 	public void demoteOfflinePlayer(UUID uuid, Rank rank) {
 		ArrayList<Rank> donorranks = getDonorRanks(uuid);
-		for (int i = 0; i < donorranks.size(); i++) {
-			if (donorranks.get(i).getLevel() >= rank.getLevel()) {
+		for (int i = donorranks.size()-1; i >= 0; i--) {
+			if (donorranks.get(i).getLevel() > rank.getLevel()) {
 				donorranks.remove(i);
 			}
 		}
+		
+		if(rank.isDonor() && !donorranks.contains(rank)){
+			donorranks.add(rank);
+		}
+		
 		setRank(uuid, rank);
 	}
 

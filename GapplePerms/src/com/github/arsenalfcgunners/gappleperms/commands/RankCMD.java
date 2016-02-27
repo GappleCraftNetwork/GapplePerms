@@ -54,14 +54,14 @@ public class RankCMD implements CommandExecutor {
 				}
 				
 				else if((args.length == 3 && args[0].equalsIgnoreCase("get")) && args[1].equalsIgnoreCase("donorranks")){
-					if(Bukkit.getPlayer(args[1]) != null){
-						Player p = Bukkit.getPlayer(args[1]);
+					if(Bukkit.getPlayer(args[2]) != null){
+						Player p = Bukkit.getPlayer(args[2]);
 						ArrayList<Rank> dranks = rm.getDonorRanks(p.getUniqueId());
 						if(dranks.size() == 0){
 							sender.sendMessage(tag+ChatColor.RED+"That player does not have any donor ranks.");
 						}
 						else{
-							String str = tag+ChatColor.GREEN+"The donor rank(s) of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" are:";
+							String str = tag+ChatColor.GREEN+"The donor rank(s) of "+ChatColor.YELLOW+args[2]+ChatColor.GREEN+" are:";
 							
 							for(Rank r : dranks){
 								str += "\n"+r.getColor()+r.getName();
@@ -88,7 +88,7 @@ public class RankCMD implements CommandExecutor {
 								
 								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 									
-									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() == rm.getRank(rankname).getLevel()){
+									if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() != rm.getRank(rankname).getLevel()){
 									
 										if(rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer(player).getRank().getLevel()){
 											assignRank(playername, rankname);
@@ -101,7 +101,7 @@ public class RankCMD implements CommandExecutor {
 									}
 									
 									else{
-										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be different than the old one.");
+										player.sendMessage(tag+ChatColor.YELLOW+"ERROR: The new rank must be different than the current one.");
 									}
 								}
 								
