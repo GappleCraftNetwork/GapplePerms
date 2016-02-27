@@ -37,12 +37,12 @@ public class RankManager {
 	}
 
 	public void addRanks() {
-		ranks.add(new Rank("Owner", ChatColor.BOLD + "" + ChatColor.DARK_RED, 10, false));
-		ranks.add(new Rank("Dev", ChatColor.BOLD + "" + ChatColor.DARK_PURPLE, 9, false));
-		ranks.add(new Rank("Admin", ChatColor.BOLD + "" + ChatColor.DARK_RED, 8, false));
+		ranks.add(new Rank("Owner", ChatColor.DARK_RED+""+ChatColor.BOLD, 10, false));
+		ranks.add(new Rank("Dev",ChatColor.DARK_PURPLE+""+ChatColor.BOLD, 9, false));
+		ranks.add(new Rank("Admin", ChatColor.DARK_RED+""+ChatColor.BOLD, 8, false));
 		ranks.add(new Rank("SrMod", ChatColor.DARK_RED + "", 7, false));
 		ranks.add(new Rank("Mod", ChatColor.RED + "", 6, false));
-		ranks.add(new Rank("VIP", ChatColor.GOLD + "", 5, true));
+		ranks.add(new Rank("VIP", ChatColor.GOLD+"", 5, true));
 		ranks.add(new Rank("Builder", ChatColor.BLUE + "", 4, true));
 		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA + "", 3, true));
 		ranks.add(new Rank("Emerald", ChatColor.GREEN + "", 2, true));
@@ -119,11 +119,16 @@ public class RankManager {
 
 	public void demoteOfflinePlayer(UUID uuid, Rank rank) {
 		ArrayList<Rank> donorranks = getDonorRanks(uuid);
-		for (int i = 0; i < donorranks.size(); i++) {
-			if (donorranks.get(i).getLevel() >= rank.getLevel()) {
+		for (int i = donorranks.size()-1; i >= 0; i--) {
+			if (donorranks.get(i).getLevel() > rank.getLevel()) {
 				donorranks.remove(i);
 			}
 		}
+		
+		if(rank.isDonor() && !donorranks.contains(rank)){
+			donorranks.add(rank);
+		}
+		
 		setRank(uuid, rank);
 	}
 

@@ -9,9 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.arsenalfcgunners.gappleperms.commands.Demote;
 import com.github.arsenalfcgunners.gappleperms.commands.Permissions;
-import com.github.arsenalfcgunners.gappleperms.commands.Promote;
 import com.github.arsenalfcgunners.gappleperms.commands.RankCMD;
 import com.github.arsenalfcgunners.gappleperms.commands.ResetDB;
 
@@ -33,8 +31,6 @@ public class GapplePerms extends JavaPlugin{
 		rm = new RankManager(this, "jdbc:mysql://167.114.208.215:3306/", "ihdb_175", "ihdb_175", "22fdf2acbd");
 		
 		//Command Executers
-		getCommand("promote").setExecutor(new Promote(this));
-		getCommand("demote").setExecutor(new Demote(this));
 		getCommand("permission").setExecutor(new Permissions(this));
 		getCommand("rank").setExecutor(new RankCMD(this));
 		getCommand("resetdb").setExecutor(new ResetDB(this));

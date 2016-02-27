@@ -31,9 +31,9 @@ public class Permissions implements CommandExecutor {
 					if((args.length == 2 && rm.isRankName(args[1])) || (args.length == 3 && rm.isRankName(args[2]))){
 						
 						if(args.length == 2 && args[0].equalsIgnoreCase("list")){
-							String msg = tag+ChatColor.GREEN+"The rank "+rm.getRank(args[2]).getColor() + rm.getRank(args[2]).getName()+ChatColor.GREEN+" has the following permissions:"+ChatColor.YELLOW;
+							String msg = tag+ChatColor.GREEN+"The rank "+rm.getRank(args[1]).getColor() + rm.getRank(args[1]).getName()+ChatColor.GREEN+" has the following permissions:"+ChatColor.YELLOW;
 							
-							for(Permission p : rm.getPerms(args[2])){
+							for(Permission p : rm.getPerms(args[1])){
 								msg += "\n"+p.getName();
 							}
 							
