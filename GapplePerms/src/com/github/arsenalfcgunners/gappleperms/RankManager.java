@@ -270,13 +270,14 @@ public class RankManager {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Rank FROM PlayerRanks WHERE UUID ='" + uuid.toString() + "';";
-
+		Rank rank = ranks.get(ranks.size() - 1);
+		
 		try {
 			openConnection();
 			s = c.prepareStatement(query);
 			rs = s.executeQuery();
 			if (rs.next()) {
-				return getRank(rs.getString("Rank"));
+				rank = getRank(rs.getString("Rank"));
 			} else {
 				executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString()
 						+ "','Default','none')");
@@ -304,8 +305,18 @@ public class RankManager {
 				closeConnection();
 			}
 		}
+		
+		if(rank.isDonor() && !gp.getProfileOfPlayer(Bukkit.getPlayer(uuid)).getDonorRanks().contains(rank)){
+			Rank highest = ranks.get(ranks.size()-1);
+			
+			for(Rank r : gp.getProfileOfPlayer(Bukkit.getPlayer(uuid)).getDonorRanks()){
+				if(r.getLevel() > highest.getLevel()){
+					rank = highest;
+				}
+			}
+		}
 
-		return ranks.get(ranks.size() - 1);
+		return rank;
 	}
 
 	public ArrayList<Permission> getPermissions(Rank rank) {
