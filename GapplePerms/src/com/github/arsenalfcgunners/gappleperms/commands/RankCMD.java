@@ -31,7 +31,7 @@ public class RankCMD implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("rank")){
 			
-			if(sender.hasPermission("gappleperms.changeperm")){
+			if(sender.hasPermission("gappleperms.change")){
 				
 				if((args.length == 1 && args[0].equalsIgnoreCase("list"))){						
 					String msg = tag+ChatColor.GREEN+"The follwing ranks are available:"+ChatColor.YELLOW;
@@ -50,7 +50,7 @@ public class RankCMD implements CommandExecutor {
 						sender.sendMessage(tag+ChatColor.GREEN+"The rank of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" is "+r.getColor()+r.getName()+ChatColor.GREEN+".");
 					}
 					else{
-						UUID uuid = gp.getUUID(args[2]);
+						UUID uuid = gp.getUUID(args[1]);
 						if(uuid != null){
 							Rank r = rm.getRankOfPlayer(uuid);
 							sender.sendMessage(tag+ChatColor.GREEN+"The rank of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" is "+r.getColor()+r.getName()+ChatColor.GREEN+".");
@@ -128,7 +128,7 @@ public class RankCMD implements CommandExecutor {
 					
 					if(rm.isRankName(rankname)){
 															
-						if(rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
+						if(!(sender instanceof Player) || rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
 							
 							if(Bukkit.getPlayer(playername) == null || !(sender instanceof Player) || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer((Player) sender).getRank().getLevel()){
 								
@@ -152,7 +152,7 @@ public class RankCMD implements CommandExecutor {
 											UUID uuid = gp.getUUID(playername);
 											
 											if(uuid != null){
-												
+												sender.sendMessage("Current level: "+rm.getRankOfPlayer(uuid).getLevel()+" Next level: "+rm.getRank(rankname).getLevel());
 												if(rm.getRankOfPlayer(uuid).getLevel() < rm.getRank(rankname).getLevel()){
 													rm.promoteOfflinePlayer(uuid, rm.getRank(rankname));
 												}

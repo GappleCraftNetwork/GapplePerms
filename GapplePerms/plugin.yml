@@ -19,5 +19,5 @@ commands:
       usage: /<command>
 
 Permissions:
-  gappleperms.changerank:
+  gappleperms.change:
     description: Allows the player to manages ranks.

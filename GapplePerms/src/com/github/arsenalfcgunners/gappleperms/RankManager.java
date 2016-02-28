@@ -63,7 +63,7 @@ public class RankManager {
 			if (ranks.get(i).getName().equals(rankname) || found) {
 				found = true;
 
-				for (Permission p : getPermissions(ranks.get(i))) {
+				for (Permission p : getPermissionsFromDB(ranks.get(i))) {
 					perms.add(p);
 				}
 			}
@@ -80,13 +80,13 @@ public class RankManager {
 	}
 
 	public void addPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissions(rank);
+		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		perms.add(new Permission(permission));
 		setPermissions(rank, perms);
 	}
 
 	public void delPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissions(rank);
+		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		perms.remove(new Permission(permission));
 		setPermissions(rank, perms);
 	}
@@ -114,7 +114,10 @@ public class RankManager {
 		if (rank.isDonor() && !donorranks.contains(rank)) {
 			donorranks.add(rank);
 		}
+		
 		setRank(uuid, rank);
+		setDonorRanks(uuid, donorranks);
+		gp.getLogger().log(Level.WARNING, "Offline player promoted.");
 	}
 
 	public void demoteOfflinePlayer(UUID uuid, Rank rank) {
@@ -130,6 +133,8 @@ public class RankManager {
 		}
 		
 		setRank(uuid, rank);
+		setDonorRanks(uuid, donorranks);
+		gp.getLogger().log(Level.WARNING, "Offline player demoted.");
 	}
 
 	public void setDonorRanks(UUID uuid, ArrayList<Rank> donorranks) {
@@ -145,30 +150,6 @@ public class RankManager {
 
 		executeUpdate("UPDATE PlayerRanks SET DonorRanks='" + str + "' WHERE UUID='" + uuid.toString() + "'");
 
-	}
-
-	public void executeUpdate(String statement) {
-		PreparedStatement s = null;
-		try {
-			openConnection();
-			s = c.prepareStatement(statement);
-			s.execute();
-		} catch (SQLException ex) {
-			gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: " + statement);
-			ex.printStackTrace();
-			stopServer();
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (c != null) {
-				closeConnection();
-			}
-		}
 	}
 
 	public ArrayList<Rank> getDonorRanks(UUID uuid) {
@@ -306,20 +287,23 @@ public class RankManager {
 			}
 		}
 		
-		if(rank.isDonor() && !gp.getProfileOfPlayer(Bukkit.getPlayer(uuid)).getDonorRanks().contains(rank)){
-			Rank highest = ranks.get(ranks.size()-1);
-			
-			for(Rank r : gp.getProfileOfPlayer(Bukkit.getPlayer(uuid)).getDonorRanks()){
+		Rank highest = ranks.get(ranks.size()-1);
+		
+		if(rank.isDonor() && !getDonorRanks(uuid).contains(rank)){			
+			for(Rank r : getDonorRanks(uuid)){
 				if(r.getLevel() > highest.getLevel()){
-					rank = highest;
+					highest = r;
 				}
 			}
+			
+			rank = highest;
+			setRank(uuid, highest);
 		}
 
 		return rank;
 	}
 
-	public ArrayList<Permission> getPermissions(Rank rank) {
+	public ArrayList<Permission> getPermissionsFromDB(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
@@ -336,9 +320,12 @@ public class RankManager {
 				str = rs.getString("Permissions");
 			}
 
-			while (str.indexOf(",") > -1) {
-				perms.add(new Permission((str.substring(str.lastIndexOf(",")))));
+			List<String> stringlist = Arrays.asList(str.split(","));
+
+			for (String r : stringlist) {
+				perms.add(new Permission(r));
 			}
+			
 		} catch (SQLException e) {
 			gp.getLogger().log(Level.SEVERE, "QUERY FAILED: " + query);
 			e.printStackTrace();
@@ -434,6 +421,30 @@ public class RankManager {
 			c.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void executeUpdate(String statement) {
+		PreparedStatement s = null;
+		try {
+			openConnection();
+			s = c.prepareStatement(statement);
+			s.execute();
+		} catch (SQLException ex) {
+			gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: " + statement);
+			ex.printStackTrace();
+			stopServer();
+		} finally {
+			if (s != null) {
+				try {
+					s.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (c != null) {
+				closeConnection();
+			}
 		}
 	}
 }
