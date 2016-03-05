@@ -127,24 +127,27 @@ public class RankCMD implements CommandExecutor {
 					String playername = args[1];
 					
 					if(rm.isRankName(rankname)){
+						
+						Rank rank = rm.getRank(rankname);
+						Player player = Bukkit.getPlayer(playername);
 															
-						if(!(sender instanceof Player) || rm.getRank(rankname).getLevel() < rm.getRankList().size()-2){
+						if(!(sender instanceof Player) || rank.getLevel() < rm.getRankList().size()-2){
 							
-							if(Bukkit.getPlayer(playername) == null || !(sender instanceof Player) || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < gp.getProfileOfPlayer((Player) sender).getRank().getLevel()){
+							if(player == null || !(sender instanceof Player) || rm.getRankOfPlayer(player.getUniqueId()).getLevel() < gp.getProfileOfPlayer((Player) sender).getRank().getLevel()){
 								
-								if(Bukkit.getPlayer(playername) == null || rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() != rm.getRank(rankname).getLevel()){
+								if(player == null || rm.getRankOfPlayer(player.getUniqueId()).getLevel() != rank.getLevel()){
 								
-									if(!(sender instanceof Player) || rm.getRank(rankname).getLevel() < gp.getProfileOfPlayer((Player) sender).getRank().getLevel()){
+									if(!(sender instanceof Player) || rank.getLevel() < gp.getProfileOfPlayer((Player) sender).getRank().getLevel()){
 										
 										Boolean messagesent = false;
-										if (Bukkit.getPlayer(playername) != null && Bukkit.getPlayer(playername).isOnline()) {
+										if (player != null && player.isOnline()) {
 										
-											if(rm.getRankOfPlayer(Bukkit.getPlayer(playername).getUniqueId()).getLevel() < rm.getRank(rankname).getLevel()){
-												gp.getProfileOfPlayer(Bukkit.getPlayer(playername)).promote(rm.getRank(rankname));
+											if(rm.getRankOfPlayer(player.getUniqueId()).getLevel() < rank.getLevel()){
+												gp.getProfileOfPlayer(player).promote(rank);
 											}
 											
 											else{
-												gp.getProfileOfPlayer(Bukkit.getPlayer(playername)).demote(rm.getRank(rankname));
+												gp.getProfileOfPlayer(player).demote(rank);
 											}
 										}
 										
@@ -152,13 +155,13 @@ public class RankCMD implements CommandExecutor {
 											UUID uuid = gp.getUUID(playername);
 											
 											if(uuid != null){
-												sender.sendMessage("Current level: "+rm.getRankOfPlayer(uuid).getLevel()+" Next level: "+rm.getRank(rankname).getLevel());
-												if(rm.getRankOfPlayer(uuid).getLevel() < rm.getRank(rankname).getLevel()){
-													rm.promoteOfflinePlayer(uuid, rm.getRank(rankname));
+												sender.sendMessage("Current level: "+rm.getRankOfPlayer(uuid).getLevel()+" Next level: "+rank.getLevel());
+												if(rm.getRankOfPlayer(uuid).getLevel() < rank.getLevel()){
+													rm.promoteOfflinePlayer(uuid, rank);
 												}
 												
 												else{
-													rm.demoteOfflinePlayer(uuid, rm.getRank(rankname));
+													rm.demoteOfflinePlayer(uuid, rank);
 												}
 											}
 											
