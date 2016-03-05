@@ -90,7 +90,11 @@ public class RankManager {
 
 	public void delPermission(Rank rank, String permission) {
 		ArrayList<Permission> perms = getPermissionsFromDB(rank);
-		perms.remove(new Permission(permission));
+		for(int i = perms.size()-1; i >= 0; i--){
+			if(perms.get(i).getName().equals(permission)){
+				perms.remove(i);
+			}
+		}
 		setPermissions(rank, perms);
 	}
 
