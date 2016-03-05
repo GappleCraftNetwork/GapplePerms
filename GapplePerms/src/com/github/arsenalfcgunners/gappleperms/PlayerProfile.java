@@ -1,33 +1,35 @@
 package com.github.arsenalfcgunners.gappleperms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class PlayerProfile {
 	private UUID uuid;
 	private Rank rank;
 	private ArrayList <Rank> donorranks; 
 	private GapplePerms gp;
-	private HashMap<UUID, PermissionAttachment> attachments;
+	PermissionAttachment pa;
+	private Player player;
 	
 	public PlayerProfile(UUID u, Rank r, GapplePerms plugin){
 		uuid = u;
 		rank = r;
 		gp = plugin;
-		attachments = new HashMap<UUID, PermissionAttachment>();
-		refresh();
+		player = Bukkit.getPlayer(uuid);
+		pa = player.addAttachment(plugin);
+		rank = gp.getRankManager().getRankOfPlayer(uuid);
+		donorranks = gp.getRankManager().getDonorRanks(uuid);
+		givePerms();
 	}
 	
 	public Player getPlayer(){
-		return Bukkit.getPlayer(uuid);
+		return player;
 	}
 	
 	public Rank getRank(){
@@ -35,11 +37,10 @@ public class PlayerProfile {
 	}
 	
 	public void givePerms(){
-		for(Permission p : gp.getRankManager().getPermissions(rank)){
-			PermissionAttachment a = Bukkit.getPlayer(uuid).addAttachment(gp);
-			a.setPermission(p, true);
-			attachments.put(uuid, a);
+		for(Permission p : gp.getRankManager().getPerms(rank)){
+			pa.setPermission(p.getName(), true);
 		}
+		player.recalculatePermissions();
 	}
 	
 	public ArrayList<Rank> getDonorRanks(){
@@ -47,12 +48,10 @@ public class PlayerProfile {
 	}
 	
 	public void clearPerms(){
-		Iterator<Entry<UUID, PermissionAttachment>> it = attachments.entrySet().iterator();
-		while(it.hasNext()) {
-			Entry<UUID, PermissionAttachment> a = it.next();
-			Bukkit.getPlayer(uuid).removeAttachment(a.getValue());
+		for(PermissionAttachmentInfo p: player.getEffectivePermissions()){
+			pa.unsetPermission(p.getPermission());
 		}
-		attachments.clear();
+		player.recalculatePermissions();
 	}
 	
 	public void promote(Rank r){

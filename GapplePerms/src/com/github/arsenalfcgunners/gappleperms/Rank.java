@@ -1,12 +1,14 @@
 package com.github.arsenalfcgunners.gappleperms;
 
+import org.bukkit.ChatColor;
+
 public class Rank {
 	private String name;
-	private String color;
+	private ChatColor color;
 	private int level;
 	private boolean isDonor;
 	
-	public Rank(String n, String c, int l, boolean id){
+	public Rank(String n, ChatColor c, int l, boolean id){
 		name = n;
 		color = c;
 		level = l;
@@ -17,7 +19,7 @@ public class Rank {
 		return name;
 	}
 		
-	public String getColor(){
+	public ChatColor getColor(){
 		return color;
 	}
 	

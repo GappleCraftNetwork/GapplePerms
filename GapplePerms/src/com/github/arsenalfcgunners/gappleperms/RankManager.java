@@ -37,33 +37,29 @@ public class RankManager {
 	}
 
 	public void addRanks() {
-		ranks.add(new Rank("Owner", ChatColor.DARK_RED+"", 10, false));
-		ranks.add(new Rank("Dev",ChatColor.DARK_PURPLE+"", 9, false));
-		ranks.add(new Rank("Admin", ChatColor.DARK_RED+"", 8, false));
-		ranks.add(new Rank("SrMod", ChatColor.DARK_RED + "", 7, false));
-		ranks.add(new Rank("Mod", ChatColor.RED + "", 6, false));
-		ranks.add(new Rank("VIP", ChatColor.GOLD+"", 5, true));
-		ranks.add(new Rank("Builder", ChatColor.BLUE + "", 4, true));
-		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA + "", 3, true));
-		ranks.add(new Rank("Emerald", ChatColor.GREEN + "", 2, true));
-		ranks.add(new Rank("Amethyst", ChatColor.LIGHT_PURPLE + "", 1, true));
-		ranks.add(new Rank("Default", ChatColor.YELLOW + "", 0, false));
+		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 9, false));
+		ranks.add(new Rank("Dev",ChatColor.DARK_PURPLE, 8, false));
+		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 7, false));
+		ranks.add(new Rank("SrMod", ChatColor.RED, 6, false));
+		ranks.add(new Rank("Mod", ChatColor.GOLD, 5, false));
+		ranks.add(new Rank("VIP", ChatColor.AQUA, 4, true));
+		ranks.add(new Rank("Diamond", ChatColor.DARK_AQUA, 3, true));
+		ranks.add(new Rank("Emerald", ChatColor.GREEN, 2, true));
+		ranks.add(new Rank("Amethyst", ChatColor.LIGHT_PURPLE, 1, true));
+		ranks.add(new Rank("Default", ChatColor.YELLOW, 0, false));
 	}
 
 	public ArrayList<Rank> getRankList() {
 		return ranks;
 	}
 
-	public ArrayList<Permission> getPerms(String rankname) {
+	public ArrayList<Permission> getPerms(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
-		boolean found = false;
 
-		for (int i = 0; i < ranks.size(); i++) {
+		for (Rank r : ranks) {
 
-			if (ranks.get(i).getName().equals(rankname) || found) {
-				found = true;
-
-				for (Permission p : getPermissions(ranks.get(i))) {
+			if (r.getLevel() <= rank.getLevel()) {
+				for (Permission p : getPermissionsFromDB(r)) {
 					perms.add(p);
 				}
 			}
@@ -71,22 +67,29 @@ public class RankManager {
 		return perms;
 	}
 
-	public boolean hasPermission(String rankname, String permission) {
-		if (getPerms(rankname).contains(new Permission(permission))) {
-			return true;
-
+	public int hasPermission(Rank rank, String permission) {		
+		for(Permission p : getPermissionsFromDB(rank)){
+			if(p.getName().equals(permission)){
+				return 1;
+			}
 		}
-		return false;
+		
+		for(Permission p : getPerms(rank)){
+			if(p.getName().equals(permission)){
+				return 2;
+			}
+		}
+		return 3;
 	}
 
 	public void addPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissions(rank);
+		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		perms.add(new Permission(permission));
 		setPermissions(rank, perms);
 	}
 
 	public void delPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissions(rank);
+		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		perms.remove(new Permission(permission));
 		setPermissions(rank, perms);
 	}
@@ -114,7 +117,9 @@ public class RankManager {
 		if (rank.isDonor() && !donorranks.contains(rank)) {
 			donorranks.add(rank);
 		}
+		
 		setRank(uuid, rank);
+		setDonorRanks(uuid, donorranks);
 	}
 
 	public void demoteOfflinePlayer(UUID uuid, Rank rank) {
@@ -130,6 +135,7 @@ public class RankManager {
 		}
 		
 		setRank(uuid, rank);
+		setDonorRanks(uuid, donorranks);
 	}
 
 	public void setDonorRanks(UUID uuid, ArrayList<Rank> donorranks) {
@@ -145,30 +151,6 @@ public class RankManager {
 
 		executeUpdate("UPDATE PlayerRanks SET DonorRanks='" + str + "' WHERE UUID='" + uuid.toString() + "'");
 
-	}
-
-	public void executeUpdate(String statement) {
-		PreparedStatement s = null;
-		try {
-			openConnection();
-			s = c.prepareStatement(statement);
-			s.execute();
-		} catch (SQLException ex) {
-			gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: " + statement);
-			ex.printStackTrace();
-			stopServer();
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (c != null) {
-				closeConnection();
-			}
-		}
 	}
 
 	public ArrayList<Rank> getDonorRanks(UUID uuid) {
@@ -270,13 +252,14 @@ public class RankManager {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Rank FROM PlayerRanks WHERE UUID ='" + uuid.toString() + "';";
-
+		Rank rank = ranks.get(ranks.size() - 1);
+		
 		try {
 			openConnection();
 			s = c.prepareStatement(query);
 			rs = s.executeQuery();
 			if (rs.next()) {
-				return getRank(rs.getString("Rank"));
+				rank = getRank(rs.getString("Rank"));
 			} else {
 				executeUpdate("INSERT INTO PlayerRanks (uuid, rank, donorranks) VALUES ('" + uuid.toString()
 						+ "','Default','none')");
@@ -304,15 +287,28 @@ public class RankManager {
 				closeConnection();
 			}
 		}
+		
+		Rank highest = ranks.get(ranks.size()-1);
+		
+		if(rank.isDonor() && !getDonorRanks(uuid).contains(rank)){			
+			for(Rank r : getDonorRanks(uuid)){
+				if(r.getLevel() > highest.getLevel()){
+					highest = r;
+				}
+			}
+			
+			rank = highest;
+			setRank(uuid, highest);
+		}
 
-		return ranks.get(ranks.size() - 1);
+		return rank;
 	}
 
-	public ArrayList<Permission> getPermissions(Rank rank) {
+	public ArrayList<Permission> getPermissionsFromDB(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
-		String query = "SELECT Permissions FROM Permissions WHERE Rank ='" + rank.getName() + "';";
+		String query = "SELECT Permissions FROM Perms WHERE Rank= '" + rank.getName() + "';";
 
 		try {
 			openConnection();
@@ -325,9 +321,12 @@ public class RankManager {
 				str = rs.getString("Permissions");
 			}
 
-			while (str.indexOf(",") > -1) {
-				perms.add(new Permission((str.substring(str.lastIndexOf(",")))));
+			List<String> stringlist = Arrays.asList(str.split(","));
+
+			for (String r : stringlist) {
+				perms.add(new Permission(r));
 			}
+			
 		} catch (SQLException e) {
 			gp.getLogger().log(Level.SEVERE, "QUERY FAILED: " + query);
 			e.printStackTrace();
@@ -358,7 +357,7 @@ public class RankManager {
 	public void setPermissions(Rank rank, ArrayList<Permission> perms) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
-		String query = "SELECT Permissions FROM Permissions WHERE Rank ='" + rank.getName() + "';";
+		String query = "SELECT Permissions FROM Perms WHERE Rank='" + rank.getName() + "';";
 
 		try {
 			openConnection();
@@ -372,10 +371,10 @@ public class RankManager {
 			}
 
 			if (rs.next()) {
-				executeUpdate("UPDATE Permissions SET Permissions='" + str + "' WHERE Rank='" + rank.getName() + "'");
+				executeUpdate("UPDATE Perms SET Permissions='" + str + "' WHERE Rank='" + rank.getName() + "'");
 			} else {
 				executeUpdate(
-						"INSERT INTO Permissions (Rank, Permissions) VALUES ('" + rank.getName() + "','" + str + "')");
+						"INSERT INTO Perms (Rank, Permissions) VALUES ('" + rank.getName() + "','" + str + "')");
 			}
 		} catch (SQLException e) {
 			gp.getLogger().log(Level.SEVERE, "QUERY FAILED: " + query);
@@ -423,6 +422,30 @@ public class RankManager {
 			c.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void executeUpdate(String statement) {
+		PreparedStatement s = null;
+		try {
+			openConnection();
+			s = c.prepareStatement(statement);
+			s.execute();
+		} catch (SQLException ex) {
+			gp.getLogger().log(Level.SEVERE, "UPDATE FAILED: " + statement);
+			ex.printStackTrace();
+			stopServer();
+		} finally {
+			if (s != null) {
+				try {
+					s.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (c != null) {
+				closeConnection();
+			}
 		}
 	}
 }
