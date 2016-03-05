@@ -31,7 +31,7 @@ public class RankCMD implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("rank")){
 			
-			if(sender.hasPermission("gappleperms.change")){
+			if(sender.hasPermission("gappleperms.admin")){
 				
 				if((args.length == 1 && args[0].equalsIgnoreCase("list"))){						
 					String msg = tag+ChatColor.GREEN+"The follwing ranks are available:"+ChatColor.YELLOW;

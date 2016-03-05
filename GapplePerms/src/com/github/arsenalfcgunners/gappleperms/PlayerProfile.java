@@ -1,35 +1,35 @@
 package com.github.arsenalfcgunners.gappleperms;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class PlayerProfile {
 	private UUID uuid;
 	private Rank rank;
 	private ArrayList <Rank> donorranks; 
 	private GapplePerms gp;
-	private PermissionAttachment pa;
-	private ArrayList<Permission> perms;
+	PermissionAttachment pa;
+	private Player player;
 	
 	public PlayerProfile(UUID u, Rank r, GapplePerms plugin){
 		uuid = u;
 		rank = r;
 		gp = plugin;
-		pa = null;
-		perms = new ArrayList<Permission>();
+		player = Bukkit.getPlayer(uuid);
+		pa = player.addAttachment(plugin);
 		rank = gp.getRankManager().getRankOfPlayer(uuid);
 		donorranks = gp.getRankManager().getDonorRanks(uuid);
 		givePerms();
 	}
 	
 	public Player getPlayer(){
-		return Bukkit.getPlayer(uuid);
+		return player;
 	}
 	
 	public Rank getRank(){
@@ -37,11 +37,10 @@ public class PlayerProfile {
 	}
 	
 	public void givePerms(){
-		pa = Bukkit.getPlayer(uuid).addAttachment(gp);
-		for(Permission p : gp.getRankManager().getPerms(rank.getName())){
-			pa.setPermission(p.toString(), true);
-			perms.add(p);
+		for(Permission p : gp.getRankManager().getPerms(rank)){
+			pa.setPermission(p.getName(), true);
 		}
+		player.recalculatePermissions();
 	}
 	
 	public ArrayList<Rank> getDonorRanks(){
@@ -49,10 +48,10 @@ public class PlayerProfile {
 	}
 	
 	public void clearPerms(){
-		for(int i = perms.size() - 1; i >= 0; i--){
-			pa.unsetPermission(perms.get(i).toString());			
+		for(PermissionAttachmentInfo p: player.getEffectivePermissions()){
+			pa.unsetPermission(p.getPermission());
 		}
-		Bukkit.getPlayer(uuid).removeAttachment(pa);
+		player.recalculatePermissions();
 	}
 	
 	public void promote(Rank r){
@@ -64,7 +63,6 @@ public class PlayerProfile {
 		gp.getRankManager().setRank(uuid, rank);
 		clearPerms();
 		givePerms();
-		gp.getLogger().log(Level.WARNING, "Online player promoted.");
 	}
 	
 	public void demote(Rank r){
@@ -84,7 +82,6 @@ public class PlayerProfile {
 		gp.getRankManager().setRank(uuid, rank);
 		clearPerms();
 		givePerms();
-		gp.getLogger().log(Level.WARNING, "Online player demoted.");
 	}
 	
 	public void refresh(){
