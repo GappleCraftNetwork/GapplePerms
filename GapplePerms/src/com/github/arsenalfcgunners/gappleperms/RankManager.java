@@ -16,13 +16,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
 
 public class RankManager {
-	private String host;
-	private String database;
-	private String user;
-	private String password;
-	private GapplePerms gp;
-	private Connection c;
-	private ArrayList<Rank> ranks;
+	private static String host;
+	private static String database;
+	private static String user;
+	private static String password;
+	private static GapplePerms gp;
+	private static Connection c;
+	private static ArrayList<Rank> ranks;
 
 	public RankManager(GapplePerms plugin, String h, String d, String u, String p) {
 		host = h;
@@ -36,7 +36,7 @@ public class RankManager {
 		addRanks();
 	}
 
-	public void addRanks() {
+	private void addRanks() {
 		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 9, false));
 		ranks.add(new Rank("Dev",ChatColor.DARK_PURPLE, 8, false));
 		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 7, false));
@@ -49,11 +49,11 @@ public class RankManager {
 		ranks.add(new Rank("Default", ChatColor.YELLOW, 0, false));
 	}
 
-	public ArrayList<Rank> getRankList() {
+	public static ArrayList<Rank> getRankList() {
 		return ranks;
 	}
 
-	public ArrayList<Permission> getPerms(Rank rank) {
+	public static ArrayList<Permission> getPerms(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 
 		for (Rank r : ranks) {
@@ -67,7 +67,7 @@ public class RankManager {
 		return perms;
 	}
 
-	public int hasPermission(Rank rank, String permission) {		
+	public static int hasPermission(Rank rank, String permission) {		
 		for(Permission p : getPermissionsFromDB(rank)){
 			if(p.getName().equals(permission)){
 				return 1;
@@ -82,13 +82,13 @@ public class RankManager {
 		return 3;
 	}
 
-	public void addPermission(Rank rank, String permission) {
+	public static void addPermission(Rank rank, String permission) {
 		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		perms.add(new Permission(permission));
 		setPermissions(rank, perms);
 	}
 
-	public void delPermission(Rank rank, String permission) {
+	public static void delPermission(Rank rank, String permission) {
 		ArrayList<Permission> perms = getPermissionsFromDB(rank);
 		for(int i = perms.size()-1; i >= 0; i--){
 			if(perms.get(i).getName().equals(permission)){
@@ -98,7 +98,7 @@ public class RankManager {
 		setPermissions(rank, perms);
 	}
 
-	public boolean isRankName(String name) {
+	public static boolean isRankName(String name) {
 		for (Rank rank : ranks) {
 			if (rank.getName().equalsIgnoreCase(name)) {
 				return true;
@@ -107,7 +107,7 @@ public class RankManager {
 		return false;
 	}
 
-	public Rank getRank(String name) {
+	public static Rank getRank(String name) {
 		for (Rank rank : ranks) {
 			if (rank.getName().equalsIgnoreCase(name)) {
 				return rank;
@@ -116,7 +116,7 @@ public class RankManager {
 		return ranks.get(ranks.size() - 1);
 	}
 
-	public void promoteOfflinePlayer(UUID uuid, Rank rank) {
+	public static void promoteOfflinePlayer(UUID uuid, Rank rank) {
 		ArrayList<Rank> donorranks = getDonorRanks(uuid);
 		if (rank.isDonor() && !donorranks.contains(rank)) {
 			donorranks.add(rank);
@@ -126,7 +126,7 @@ public class RankManager {
 		setDonorRanks(uuid, donorranks);
 	}
 
-	public void demoteOfflinePlayer(UUID uuid, Rank rank) {
+	public static void demoteOfflinePlayer(UUID uuid, Rank rank) {
 		ArrayList<Rank> donorranks = getDonorRanks(uuid);
 		for (int i = donorranks.size()-1; i >= 0; i--) {
 			if (donorranks.get(i).getLevel() > rank.getLevel()) {
@@ -142,7 +142,7 @@ public class RankManager {
 		setDonorRanks(uuid, donorranks);
 	}
 
-	public void setDonorRanks(UUID uuid, ArrayList<Rank> donorranks) {
+	public static void setDonorRanks(UUID uuid, ArrayList<Rank> donorranks) {
 		String str = "";
 
 		for (Rank rank : donorranks) {
@@ -157,7 +157,7 @@ public class RankManager {
 
 	}
 
-	public ArrayList<Rank> getDonorRanks(UUID uuid) {
+	public static ArrayList<Rank> getDonorRanks(UUID uuid) {
 		ArrayList<Rank> dranks = new ArrayList<Rank>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
@@ -209,7 +209,7 @@ public class RankManager {
 		return dranks;
 	}
 
-	public void setRank(UUID uuid, Rank rank) {
+	public static void setRank(UUID uuid, Rank rank) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Rank FROM PlayerRanks WHERE UUID ='" + uuid.toString() + "';";
@@ -252,7 +252,7 @@ public class RankManager {
 
 	}
 
-	public Rank getRankOfPlayer(UUID uuid) {
+	public static Rank getRankOfPlayer(UUID uuid) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Rank FROM PlayerRanks WHERE UUID ='" + uuid.toString() + "';";
@@ -308,7 +308,7 @@ public class RankManager {
 		return rank;
 	}
 
-	public ArrayList<Permission> getPermissionsFromDB(Rank rank) {
+	public static ArrayList<Permission> getPermissionsFromDB(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
@@ -358,7 +358,7 @@ public class RankManager {
 		return perms;
 	}
 
-	public void setPermissions(Rank rank, ArrayList<Permission> perms) {
+	public static void setPermissions(Rank rank, ArrayList<Permission> perms) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Permissions FROM Perms WHERE Rank='" + rank.getName() + "';";
@@ -405,12 +405,12 @@ public class RankManager {
 		}
 	}
 
-	public void stopServer() {
+	public static void stopServer() {
 		Bukkit.getLogger().info("Database Failure! Stopping server.");
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
 	}
 
-	public void openConnection() {
+	public static void openConnection() {
 		try {
 			c = DriverManager.getConnection(host + database + "?autoReconnect=true", user, password);
 		}
@@ -421,7 +421,7 @@ public class RankManager {
 		}
 	}
 
-	public void closeConnection() {
+	public static void closeConnection() {
 		try {
 			c.close();
 		} catch (SQLException e) {
@@ -429,7 +429,7 @@ public class RankManager {
 		}
 	}
 	
-	public void executeUpdate(String statement) {
+	public static void executeUpdate(String statement) {
 		PreparedStatement s = null;
 		try {
 			openConnection();

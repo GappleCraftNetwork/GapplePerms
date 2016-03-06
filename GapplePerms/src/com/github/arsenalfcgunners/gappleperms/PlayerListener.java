@@ -25,7 +25,7 @@ public class PlayerListener implements Listener{
 		Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(gp, new Runnable() { // Perms can only be added after a slight delay.
             public void run() {
             	if(player.isOnline()){ // Prevents a null pointer if the player gets kicked while joining.
-	            	PlayerProfile profile = new PlayerProfile(player.getUniqueId(), gp.getRankManager().getRankOfPlayer(player.getUniqueId()), gp);
+	            	PlayerProfile profile = new PlayerProfile(player.getUniqueId(), RankManager.getRankOfPlayer(player.getUniqueId()), gp);
 	        		gp.addPlayerProfile(profile);
             	}
             }

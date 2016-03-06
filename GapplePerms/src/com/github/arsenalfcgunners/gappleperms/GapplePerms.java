@@ -14,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.arsenalfcgunners.gappleperms.commands.Permissions;
 import com.github.arsenalfcgunners.gappleperms.commands.RankCMD;
-import com.github.arsenalfcgunners.gappleperms.commands.ResetDB;
 
 public class GapplePerms extends JavaPlugin{
 	private RankManager rm;
@@ -36,7 +35,6 @@ public class GapplePerms extends JavaPlugin{
 		//Command Executers
 		getCommand("permission").setExecutor(new Permissions(this));
 		getCommand("rank").setExecutor(new RankCMD(this));
-		getCommand("resetdb").setExecutor(new ResetDB(this));
 		
 		for(Player player : Bukkit.getOnlinePlayers()){
 			addPlayerProfile(player);
@@ -60,10 +58,10 @@ public class GapplePerms extends JavaPlugin{
 		ArrayList<Rank> donorranks = profile.getDonorRanks();
 		donorranks.remove(donorranks.indexOf(r));
 		if(donorranks.isEmpty()){
-			profile.demote(rm.getRank("default"));
+			profile.demote(RankManager.getRank("default"));
 		}
 		else{
-			Rank highest = rm.getRank("default");
+			Rank highest = RankManager.getRank("default");
 			for(Rank rank : donorranks){
 				if(rank.getLevel() > highest.getLevel()){
 					highest = rank;
@@ -71,7 +69,7 @@ public class GapplePerms extends JavaPlugin{
 			}
 			profile.demote(highest);
 		}
-		rm.setDonorRanks(p.getUniqueId(), donorranks);
+		RankManager.setDonorRanks(p.getUniqueId(), donorranks);
 	}
 	
 	public PlayerProfile getProfileOfPlayer(Player p){
@@ -84,7 +82,7 @@ public class GapplePerms extends JavaPlugin{
 	}
 	
 	public void addPlayerProfile(Player p){
-		PlayerProfile profile = new PlayerProfile(p.getUniqueId(), rm.getRankOfPlayer(p.getUniqueId()), this);
+		PlayerProfile profile = new PlayerProfile(p.getUniqueId(), RankManager.getRankOfPlayer(p.getUniqueId()), this);
 		profile.givePerms();
 		pp.add(profile);
 	}

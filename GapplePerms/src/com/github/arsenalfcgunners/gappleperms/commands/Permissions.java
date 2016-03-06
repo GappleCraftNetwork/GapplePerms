@@ -13,12 +13,10 @@ import com.github.arsenalfcgunners.gappleperms.RankManager;
 public class Permissions implements CommandExecutor {
 	private GapplePerms gp;
 	private String tag;
-	private RankManager rm;
 
 	public Permissions(GapplePerms plugin) {
 		gp = plugin;
 		tag = gp.getTag();
-		rm = gp.getRankManager();
 	}
 
 	@Override
@@ -29,14 +27,14 @@ public class Permissions implements CommandExecutor {
 				
 				if((args.length == 2 && args[0].equalsIgnoreCase("list")) || (args.length == 3 && (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("has")))){
 						
-					if((args.length == 2 && rm.isRankName(args[1])) || (args.length == 3 && rm.isRankName(args[2]))){
+					if((args.length == 2 && RankManager.isRankName(args[1])) || (args.length == 3 && RankManager.isRankName(args[2]))){
 						
 						if(args.length == 2 && args[0].equalsIgnoreCase("list")){
-							Rank rank = rm.getRank(args[1]);
+							Rank rank = RankManager.getRank(args[1]);
 							String msg = tag+ChatColor.GREEN+"The rank "+rank.getColor() + rank.getName()+ChatColor.GREEN+" has the following permissions:";
 														
-							for(Permission p : rm.getPerms(rank)){
-								if(rm.hasPermission(rank, p.getName()) == 1){
+							for(Permission p : RankManager.getPerms(rank)){
+								if(RankManager.hasPermission(rank, p.getName()) == 1){
 									msg += "\n"+ChatColor.GREEN+p.getName();
 								}
 								else{
@@ -50,9 +48,9 @@ public class Permissions implements CommandExecutor {
 						}
 						
 						else if(args.length == 3 && args[0].equalsIgnoreCase("add")){
-							Rank rank = rm.getRank(args[2]);
-							if(rm.hasPermission(rank, args[1]) != 2){
-								rm.addPermission(rank, args[1]);
+							Rank rank = RankManager.getRank(args[2]);
+							if(RankManager.hasPermission(rank, args[1]) != 2){
+								RankManager.addPermission(rank, args[1]);
 								sender.sendMessage(tag+ChatColor.GREEN+"The permission was added successfully!");
 							}
 							else{
@@ -61,9 +59,9 @@ public class Permissions implements CommandExecutor {
 						}
 						
 						else if(args.length == 3 && args[0].equalsIgnoreCase("delete")){
-							Rank rank = rm.getRank(args[2]);
-							if(rm.hasPermission(rank, args[1]) == 1){
-								rm.delPermission(rank, args[1]);
+							Rank rank = RankManager.getRank(args[2]);
+							if(RankManager.hasPermission(rank, args[1]) == 1){
+								RankManager.delPermission(rank, args[1]);
 								sender.sendMessage(tag+ChatColor.GREEN+"The permission was removed successfully!");
 							}
 							else{
@@ -72,7 +70,7 @@ public class Permissions implements CommandExecutor {
 						}
 						
 						else if(args.length == 3 && args[0].equalsIgnoreCase("has")){
-							int i = rm.hasPermission(rm.getRank(args[2]), args[1]);
+							int i = RankManager.hasPermission(RankManager.getRank(args[2]), args[1]);
 							
 							if(i == 1){
 								sender.sendMessage(tag+ChatColor.DARK_GREEN+"That rank has that permission!");

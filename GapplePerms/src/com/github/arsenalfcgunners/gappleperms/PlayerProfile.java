@@ -13,18 +13,16 @@ public class PlayerProfile {
 	private UUID uuid;
 	private Rank rank;
 	private ArrayList <Rank> donorranks; 
-	private GapplePerms gp;
 	PermissionAttachment pa;
 	private Player player;
 	
 	public PlayerProfile(UUID u, Rank r, GapplePerms plugin){
 		uuid = u;
 		rank = r;
-		gp = plugin;
 		player = Bukkit.getPlayer(uuid);
 		pa = player.addAttachment(plugin);
-		rank = gp.getRankManager().getRankOfPlayer(uuid);
-		donorranks = gp.getRankManager().getDonorRanks(uuid);
+		rank = RankManager.getRankOfPlayer(uuid);
+		donorranks = RankManager.getDonorRanks(uuid);
 		givePerms();
 	}
 	
@@ -37,7 +35,7 @@ public class PlayerProfile {
 	}
 	
 	public void givePerms(){
-		for(Permission p : gp.getRankManager().getPerms(rank)){
+		for(Permission p : RankManager.getPerms(rank)){
 			pa.setPermission(p.getName(), true);
 		}
 		player.recalculatePermissions();
@@ -59,8 +57,8 @@ public class PlayerProfile {
 		if(rank.isDonor() && !donorranks.contains(rank)){
 			donorranks.add(rank);
 		}
-		gp.getRankManager().setDonorRanks(uuid, donorranks);
-		gp.getRankManager().setRank(uuid, rank);
+		RankManager.setDonorRanks(uuid, donorranks);
+		RankManager.setRank(uuid, rank);
 		clearPerms();
 		givePerms();
 	}
@@ -78,15 +76,15 @@ public class PlayerProfile {
 			donorranks.add(rank);
 		}
 		
-		gp.getRankManager().setDonorRanks(uuid, donorranks);
-		gp.getRankManager().setRank(uuid, rank);
+		RankManager.setDonorRanks(uuid, donorranks);
+		RankManager.setRank(uuid, rank);
 		clearPerms();
 		givePerms();
 	}
 	
 	public void refresh(){
-		rank = gp.getRankManager().getRankOfPlayer(uuid);
-		donorranks = gp.getRankManager().getDonorRanks(uuid);
+		rank = RankManager.getRankOfPlayer(uuid);
+		donorranks = RankManager.getDonorRanks(uuid);
 		clearPerms();
 		givePerms();
 	}
