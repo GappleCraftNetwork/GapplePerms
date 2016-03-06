@@ -48,7 +48,7 @@ public class RankCMD implements CommandExecutor {
 						sender.sendMessage(tag+ChatColor.GREEN+"The rank of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" is "+r.getColor()+r.getName()+ChatColor.GREEN+".");
 					}
 					else{
-						UUID uuid = gp.getUUID(args[1]);
+						UUID uuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
 						if(uuid != null){
 							Rank r = RankManager.getRankOfPlayer(uuid);
 							sender.sendMessage(tag+ChatColor.GREEN+"The rank of "+ChatColor.YELLOW+args[1]+ChatColor.GREEN+" is "+r.getColor()+r.getName()+ChatColor.GREEN+".");
@@ -77,7 +77,7 @@ public class RankCMD implements CommandExecutor {
 						}
 					}
 					else{
-						UUID uuid = gp.getUUID(args[2]);
+						UUID uuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
 						if(uuid != null){
 							ArrayList<Rank> dranks = RankManager.getDonorRanks(uuid);
 							if(dranks.size() == 0){
@@ -100,7 +100,7 @@ public class RankCMD implements CommandExecutor {
 				}
 				
 				else if(!(sender instanceof Player) && args.length == 4 && args[0].equals("remove") && args[1].equals("donorrank")){
-					UUID uuid = gp.getUUID(args[2]);
+					UUID uuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
 					if(uuid != null){
 						ArrayList<Rank> donorranks = RankManager.getDonorRanks(uuid);
 						
@@ -150,7 +150,8 @@ public class RankCMD implements CommandExecutor {
 										}
 										
 										else{
-											UUID uuid = gp.getUUID(playername);
+											UUID uuid = Bukkit.getOfflinePlayer(playername).getUniqueId();
+
 											
 											if(uuid != null){
 												sender.sendMessage("Current level: "+RankManager.getRankOfPlayer(uuid).getLevel()+" Next level: "+rank.getLevel());

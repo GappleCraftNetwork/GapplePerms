@@ -1,11 +1,8 @@
 package com.github.arsenalfcgunners.gappleperms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Timer;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -109,18 +106,5 @@ public class GapplePerms extends JavaPlugin{
 	
 	public String getTag(){
 		return tag;
-	}
-	
-	public UUID getUUID(String player){
-		UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(player));
-		Map<String, UUID> response = null;
-		
-		try {
-			response = fetcher.call();
-		} catch (Exception e) {
-			getLogger().warning("Error while retrieving the UUID");
-			e.printStackTrace();
-		}
-		return response.get(player);
 	}
 }
