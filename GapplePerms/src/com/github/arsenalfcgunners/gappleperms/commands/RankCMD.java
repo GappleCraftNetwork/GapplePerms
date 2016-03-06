@@ -154,7 +154,6 @@ public class RankCMD implements CommandExecutor {
 
 											
 											if(uuid != null){
-												sender.sendMessage("Current level: "+RankManager.getRankOfPlayer(uuid).getLevel()+" Next level: "+rank.getLevel());
 												if(RankManager.getRankOfPlayer(uuid).getLevel() < rank.getLevel()){
 													RankManager.promoteOfflinePlayer(uuid, rank);
 												}
