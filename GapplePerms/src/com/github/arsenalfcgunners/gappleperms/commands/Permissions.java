@@ -49,7 +49,7 @@ public class Permissions implements CommandExecutor {
 						
 						else if(args.length == 3 && args[0].equalsIgnoreCase("add")){
 							Rank rank = RankManager.getRank(args[2]);
-							if(RankManager.hasPermission(rank, args[1]) != 2){
+							if(RankManager.hasPermission(rank, args[1]) == 3){
 								RankManager.addPermission(rank, args[1]);
 								sender.sendMessage(tag+ChatColor.GREEN+"The permission was added successfully!");
 							}
