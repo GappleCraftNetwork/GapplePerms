@@ -13,7 +13,7 @@ public class PlayerProfile {
 	private UUID uuid;
 	private Rank rank;
 	private ArrayList <Rank> donorranks; 
-	PermissionAttachment pa;
+	private PermissionAttachment pa;
 	private Player player;
 	
 	public PlayerProfile(UUID u, Rank r, GapplePerms plugin){
@@ -23,6 +23,7 @@ public class PlayerProfile {
 		pa = player.addAttachment(plugin);
 		rank = RankManager.getRankOfPlayer(uuid);
 		donorranks = RankManager.getDonorRanks(uuid);
+
 		givePerms();
 	}
 	
@@ -34,7 +35,7 @@ public class PlayerProfile {
 		return rank;
 	}
 	
-	public void givePerms(){
+	public synchronized void givePerms(){
 		for(Permission p : RankManager.getPerms(rank)){
 			pa.setPermission(p.getName(), true);
 		}
@@ -45,7 +46,7 @@ public class PlayerProfile {
 		return donorranks;
 	}
 	
-	public void clearPerms(){
+	public synchronized void clearPerms(){
 		for(PermissionAttachmentInfo p: player.getEffectivePermissions()){
 			pa.unsetPermission(p.getPermission());
 		}
@@ -82,10 +83,10 @@ public class PlayerProfile {
 		givePerms();
 	}
 	
-	public void refresh(){
+	public synchronized void refresh(){		
 		rank = RankManager.getRankOfPlayer(uuid);
 		donorranks = RankManager.getDonorRanks(uuid);
 		clearPerms();
-		givePerms();
+		givePerms();	
 	}
 }

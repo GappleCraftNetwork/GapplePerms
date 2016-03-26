@@ -1,6 +1,6 @@
 name: GapplePerms
 main: com.github.arsenalfcgunners.gappleperms.GapplePerms
-version: 1.0
+version: 1.1
 commands:
    promote:
       description: Promotes a player to a higher rank.

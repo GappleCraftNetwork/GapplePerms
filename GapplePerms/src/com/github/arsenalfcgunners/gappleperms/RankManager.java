@@ -38,7 +38,7 @@ public class RankManager {
 
 	private void addRanks() {
 		ranks.add(new Rank("Owner", ChatColor.DARK_RED, 9, false));
-		ranks.add(new Rank("Dev",ChatColor.DARK_PURPLE, 8, false));
+		ranks.add(new Rank("Dev",ChatColor.BLUE, 8, false));
 		ranks.add(new Rank("Admin", ChatColor.DARK_RED, 7, false));
 		ranks.add(new Rank("SrMod", ChatColor.RED, 6, false));
 		ranks.add(new Rank("Mod", ChatColor.GOLD, 5, false));
@@ -49,27 +49,28 @@ public class RankManager {
 		ranks.add(new Rank("Default", ChatColor.YELLOW, 0, false));
 	}
 
-	public static ArrayList<Rank> getRankList() {
+	public synchronized static ArrayList<Rank> getRankList() {
 		return ranks;
 	}
 
 	public static ArrayList<Permission> getPerms(Rank rank) {
 		ArrayList<Permission> perms = new ArrayList<Permission>();
-
+		
 		for (Rank r : ranks) {
 
 			if (r.getLevel() <= rank.getLevel()) {
-				for (Permission p : getPermissionsFromDB(r)) {
-					perms.add(p);
+				for (String p : getPermissionsFromDB(r)) {
+					perms.add(new Permission(p));
 				}
 			}
 		}
+		
 		return perms;
 	}
 
-	public static int hasPermission(Rank rank, String permission) {		
-		for(Permission p : getPermissionsFromDB(rank)){
-			if(p.getName().equals(permission)){
+	public synchronized static int hasPermission(Rank rank, String permission) {		
+		for(String p : getPermissionsFromDB(rank)){
+			if(p.equals(permission)){
 				return 1;
 			}
 		}
@@ -79,40 +80,43 @@ public class RankManager {
 				return 2;
 			}
 		}
+		
 		return 3;
 	}
 
 	public static void addPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissionsFromDB(rank);
-		perms.add(new Permission(permission));
+		List<String> perms = getPermissionsFromDB(rank);
+		perms.add(permission);
 		setPermissions(rank, perms);
 	}
 
 	public static void delPermission(Rank rank, String permission) {
-		ArrayList<Permission> perms = getPermissionsFromDB(rank);
+		List<String> perms = getPermissionsFromDB(rank);
 		for(int i = perms.size()-1; i >= 0; i--){
-			if(perms.get(i).getName().equals(permission)){
+			if(perms.get(i).equals(permission)){
 				perms.remove(i);
 			}
 		}
 		setPermissions(rank, perms);
 	}
 
-	public static boolean isRankName(String name) {
+	public synchronized static boolean isRankName(String name) {
 		for (Rank rank : ranks) {
 			if (rank.getName().equalsIgnoreCase(name)) {
 				return true;
 			}
 		}
+				
 		return false;
 	}
 
-	public static Rank getRank(String name) {
+	public synchronized static Rank getRank(String name) {
 		for (Rank rank : ranks) {
 			if (rank.getName().equalsIgnoreCase(name)) {
 				return rank;
 			}
 		}
+		
 		return ranks.get(ranks.size() - 1);
 	}
 
@@ -157,12 +161,12 @@ public class RankManager {
 
 	}
 
-	public static ArrayList<Rank> getDonorRanks(UUID uuid) {
+	public synchronized static ArrayList<Rank> getDonorRanks(UUID uuid) {
 		ArrayList<Rank> dranks = new ArrayList<Rank>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT DonorRanks FROM PlayerRanks WHERE UUID= '" + uuid.toString() + "';";
-
+		
 		try {
 			openConnection();
 			s = c.prepareStatement(query);
@@ -206,6 +210,7 @@ public class RankManager {
 				closeConnection();
 			}
 		}
+				
 		return dranks;
 	}
 
@@ -252,10 +257,11 @@ public class RankManager {
 
 	}
 
-	public static Rank getRankOfPlayer(UUID uuid) {
+	public synchronized static Rank getRankOfPlayer(UUID uuid) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Rank FROM PlayerRanks WHERE UUID ='" + uuid.toString() + "';";
+		
 		Rank rank = ranks.get(ranks.size() - 1);
 		
 		try {
@@ -290,6 +296,7 @@ public class RankManager {
 			if (c != null) {
 				closeConnection();
 			}
+			
 		}
 		
 		Rank highest = ranks.get(ranks.size()-1);
@@ -304,12 +311,12 @@ public class RankManager {
 			rank = highest;
 			setRank(uuid, highest);
 		}
-
+		
 		return rank;
 	}
 
-	public static ArrayList<Permission> getPermissionsFromDB(Rank rank) {
-		ArrayList<Permission> perms = new ArrayList<Permission>();
+	public synchronized static List<String> getPermissionsFromDB(Rank rank) {
+		List<String> stringlist = new ArrayList<String>();
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Permissions FROM Perms WHERE Rank= '" + rank.getName() + "';";
@@ -324,12 +331,8 @@ public class RankManager {
 			if (rs.next()) {
 				str = rs.getString("Permissions");
 			}
-
-			List<String> stringlist = Arrays.asList(str.split(","));
-
-			for (String r : stringlist) {
-				perms.add(new Permission(r));
-			}
+			
+			stringlist = Arrays.asList(str.split(","));	
 			
 		} catch (SQLException e) {
 			gp.getLogger().log(Level.SEVERE, "QUERY FAILED: " + query);
@@ -354,11 +357,11 @@ public class RankManager {
 				closeConnection();
 			}
 		}
-
-		return perms;
+					
+		return stringlist;
 	}
 
-	public static void setPermissions(Rank rank, ArrayList<Permission> perms) {
+	public static void setPermissions(Rank rank, List<String> p) {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		String query = "SELECT Permissions FROM Perms WHERE Rank='" + rank.getName() + "';";
@@ -370,8 +373,8 @@ public class RankManager {
 
 			String str = "";
 
-			for (Permission p : perms) {
-				str += p.getName() + ",";
+			for (String perm : p) {
+				str += perm + ",";
 			}
 
 			if (rs.next()) {
